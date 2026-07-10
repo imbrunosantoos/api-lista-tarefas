@@ -1,0 +1,25 @@
+# dependencies
+/node_modules
+
+# build output
+/dist
+
+# environment
+.env
+
+# database
+*.sqlite
+*.sqlite-journal
+
+# logs
+*.log
+npm-debug.log*
+
+# coverage
+/coverage
+.nyc_output
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
