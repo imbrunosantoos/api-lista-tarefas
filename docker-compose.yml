@@ -1,0 +1,16 @@
+services:
+  api:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      # absolute path so the database lands on the mounted volume
+      DATABASE_URL: 'file:/app/data/prod.sqlite'
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET before running docker compose}
+      JWT_EXPIRES_IN: 15m
+      REFRESH_TOKEN_TTL_DAYS: 7
+    volumes:
+      - api-data:/app/data
+
+volumes:
+  api-data:

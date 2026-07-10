@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+docs
+.git
+.github
+.env
+*.sqlite
+*.sqlite-journal
+*.md
