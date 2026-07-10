@@ -17,10 +17,11 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Task List API')
     .setDescription(
-      'A RESTful API for managing personal task lists with JWT authentication. ' +
-        'Register a user, log in to get an access token, then use the Authorize ' +
-        'button to call the protected endpoints.',
+      'REST API for managing personal to-do lists. Create an account with ' +
+        'POST /auth/register, log in to get a token, then click Authorize ' +
+        'and paste it to use the protected endpoints.',
     )
+    .setContact('Bruno Santos', 'https://github.com/imbrunosantoos', '')
     .setVersion('1.0')
     .addBearerAuth(
       {
