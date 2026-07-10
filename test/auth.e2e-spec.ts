@@ -70,9 +70,12 @@ describe('Auth (e2e)', () => {
         .send({ email: user.email, password: user.password })
         .expect(200);
 
-      const body = response.body as { accessToken: string };
-      expect(body).toHaveProperty('accessToken');
+      const body = response.body as {
+        accessToken: string;
+        refreshToken: string;
+      };
       expect(typeof body.accessToken).toBe('string');
+      expect(typeof body.refreshToken).toBe('string');
     });
 
     it('rejects invalid credentials', () => {
@@ -104,6 +107,67 @@ describe('Auth (e2e)', () => {
 
     it('rejects requests without a token', () => {
       return request(app.getHttpServer()).get('/users/me').expect(401);
+    });
+  });
+
+  describe('POST /auth/refresh', () => {
+    type TokenPair = { accessToken: string; refreshToken: string };
+
+    const login = async (): Promise<TokenPair> => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ email: user.email, password: user.password })
+        .expect(200);
+      return response.body as TokenPair;
+    };
+
+    it('exchanges a refresh token for a new pair', async () => {
+      const { refreshToken } = await login();
+
+      const response = await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .send({ refreshToken })
+        .expect(200);
+
+      const body = response.body as TokenPair;
+      expect(typeof body.accessToken).toBe('string');
+      expect(typeof body.refreshToken).toBe('string');
+      expect(body.refreshToken).not.toBe(refreshToken);
+    });
+
+    it('rejects a refresh token that was already used (rotation)', async () => {
+      const { refreshToken } = await login();
+
+      await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .send({ refreshToken })
+        .expect(200);
+
+      return request(app.getHttpServer())
+        .post('/auth/refresh')
+        .send({ refreshToken })
+        .expect(401);
+    });
+
+    it('rejects a made-up refresh token', () => {
+      return request(app.getHttpServer())
+        .post('/auth/refresh')
+        .send({ refreshToken: 'not-a-real-token' })
+        .expect(401);
+    });
+
+    it('rejects a refresh token after logout', async () => {
+      const { refreshToken } = await login();
+
+      await request(app.getHttpServer())
+        .post('/auth/logout')
+        .send({ refreshToken })
+        .expect(204);
+
+      return request(app.getHttpServer())
+        .post('/auth/refresh')
+        .send({ refreshToken })
+        .expect(401);
     });
   });
 });

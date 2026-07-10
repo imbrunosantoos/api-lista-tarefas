@@ -10,6 +10,7 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 
 @ApiTags('auth')
@@ -29,10 +30,30 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Authenticate and receive a JWT access token' })
-  @ApiOkResponse({ description: 'Returns the JWT access token' })
+  @ApiOperation({
+    summary: 'Authenticate and receive an access/refresh token pair',
+  })
+  @ApiOkResponse({ description: 'Returns the access and refresh tokens' })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Exchange a refresh token for a new token pair (rotation)',
+  })
+  @ApiOkResponse({ description: 'Returns a new access and refresh token pair' })
+  @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token' })
+  refresh(@Body() dto: RefreshTokenDto) {
+    return this.authService.refresh(dto.refreshToken);
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Revoke a refresh token' })
+  logout(@Body() dto: RefreshTokenDto) {
+    return this.authService.logout(dto.refreshToken);
   }
 }
