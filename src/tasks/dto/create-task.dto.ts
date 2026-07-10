@@ -1,11 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsDateString,
   IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
 } from 'class-validator';
+import { TaskPriority } from '../task-priority.enum';
 import { TaskStatus } from '../task-status.enum';
 
 export class CreateTaskDto {
@@ -25,4 +27,14 @@ export class CreateTaskDto {
   @IsOptional()
   @IsEnum(TaskStatus)
   status?: TaskStatus;
+
+  @ApiPropertyOptional({ enum: TaskPriority, default: TaskPriority.MEDIUM })
+  @IsOptional()
+  @IsEnum(TaskPriority)
+  priority?: TaskPriority;
+
+  @ApiPropertyOptional({ example: '2026-08-01T12:00:00.000Z' })
+  @IsOptional()
+  @IsDateString()
+  dueDate?: string;
 }

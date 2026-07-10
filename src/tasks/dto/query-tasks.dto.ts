@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { TaskPriority } from '../task-priority.enum';
 import { TaskStatus } from '../task-status.enum';
 
 export class QueryTasksDto {
@@ -8,6 +9,11 @@ export class QueryTasksDto {
   @IsOptional()
   @IsEnum(TaskStatus)
   status?: TaskStatus;
+
+  @ApiPropertyOptional({ enum: TaskPriority })
+  @IsOptional()
+  @IsEnum(TaskPriority)
+  priority?: TaskPriority;
 
   @ApiPropertyOptional({ default: 1, minimum: 1 })
   @IsOptional()

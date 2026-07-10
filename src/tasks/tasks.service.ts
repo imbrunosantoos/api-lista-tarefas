@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { QueryTasksDto } from './dto/query-tasks.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { TaskPriority } from './task-priority.enum';
 import { TaskStatus } from './task-status.enum';
 
 export type PaginatedTasks = {
@@ -26,6 +27,8 @@ export class TasksService {
         title: dto.title,
         description: dto.description,
         status: dto.status ?? TaskStatus.PENDING,
+        priority: dto.priority ?? TaskPriority.MEDIUM,
+        dueDate: dto.dueDate ? new Date(dto.dueDate) : null,
         userId,
       },
     });
@@ -34,7 +37,11 @@ export class TasksService {
   async findAll(userId: string, query: QueryTasksDto): Promise<PaginatedTasks> {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
-    const where = { userId, ...(query.status && { status: query.status }) };
+    const where = {
+      userId,
+      ...(query.status && { status: query.status }),
+      ...(query.priority && { priority: query.priority }),
+    };
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.task.findMany({
@@ -67,7 +74,16 @@ export class TasksService {
 
   async update(userId: string, id: string, dto: UpdateTaskDto): Promise<Task> {
     await this.findOne(userId, id);
-    return this.prisma.task.update({ where: { id }, data: dto });
+    const { dueDate, ...rest } = dto;
+    return this.prisma.task.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(dueDate !== undefined && {
+          dueDate: dueDate ? new Date(dueDate) : null,
+        }),
+      },
+    });
   }
 
   async remove(userId: string, id: string): Promise<void> {

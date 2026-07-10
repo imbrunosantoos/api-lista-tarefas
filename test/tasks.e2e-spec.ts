@@ -98,6 +98,45 @@ describe('Tasks (e2e)', () => {
         .send({ title: 'Task', status: 'NOT_A_STATUS' })
         .expect(400);
     });
+
+    it('creates a task with priority and due date', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/tasks')
+        .set('Authorization', authHeader())
+        .send({
+          title: 'Pay the bills',
+          priority: 'HIGH',
+          dueDate: '2026-08-01T12:00:00.000Z',
+        })
+        .expect(201);
+
+      expect(response.body).toMatchObject({
+        priority: 'HIGH',
+        dueDate: '2026-08-01T12:00:00.000Z',
+      });
+
+      const created = response.body as TaskResponse;
+      await request(app.getHttpServer())
+        .delete(`/tasks/${created.id}`)
+        .set('Authorization', authHeader())
+        .expect(204);
+    });
+
+    it('rejects an invalid priority', () => {
+      return request(app.getHttpServer())
+        .post('/tasks')
+        .set('Authorization', authHeader())
+        .send({ title: 'Task', priority: 'URGENT' })
+        .expect(400);
+    });
+
+    it('rejects an invalid due date', () => {
+      return request(app.getHttpServer())
+        .post('/tasks')
+        .set('Authorization', authHeader())
+        .send({ title: 'Task', dueDate: 'tomorrow' })
+        .expect(400);
+    });
   });
 
   describe('GET /tasks', () => {
