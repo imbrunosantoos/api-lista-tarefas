@@ -6,7 +6,11 @@ import { PrismaService } from '../prisma/prisma.service';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(data: { name: string; email: string; password: string }): Promise<User> {
+  create(data: {
+    name: string;
+    email: string;
+    password: string;
+  }): Promise<User> {
     return this.prisma.user.create({ data });
   }
 

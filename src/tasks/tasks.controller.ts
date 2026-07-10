@@ -46,7 +46,9 @@ export class TasksController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List tasks with optional status filter and pagination' })
+  @ApiOperation({
+    summary: 'List tasks with optional status filter and pagination',
+  })
   @ApiOkResponse({ description: 'Returns a paginated list of tasks' })
   findAll(@CurrentUser() user: SafeUser, @Query() query: QueryTasksDto) {
     return this.tasksService.findAll(user.id, query);

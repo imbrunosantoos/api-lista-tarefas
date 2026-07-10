@@ -70,8 +70,9 @@ describe('Auth (e2e)', () => {
         .send({ email: user.email, password: user.password })
         .expect(200);
 
-      expect(response.body).toHaveProperty('accessToken');
-      expect(typeof response.body.accessToken).toBe('string');
+      const body = response.body as { accessToken: string };
+      expect(body).toHaveProperty('accessToken');
+      expect(typeof body.accessToken).toBe('string');
     });
 
     it('rejects invalid credentials', () => {
@@ -88,10 +89,11 @@ describe('Auth (e2e)', () => {
         .post('/auth/login')
         .send({ email: user.email, password: user.password })
         .expect(200);
+      const { accessToken } = login.body as { accessToken: string };
 
       const response = await request(app.getHttpServer())
         .get('/users/me')
-        .set('Authorization', `Bearer ${login.body.accessToken}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
       expect(response.body).toMatchObject({

@@ -4,6 +4,13 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
+type AuthResponse = { accessToken: string };
+type TaskResponse = { id: string; status: string };
+type TaskListResponse = {
+  data: TaskResponse[];
+  meta: { total: number; page: number; limit: number };
+};
+
 describe('Tasks (e2e)', () => {
   let app: INestApplication<App>;
   let accessToken: string;
@@ -38,7 +45,7 @@ describe('Tasks (e2e)', () => {
       email: 'tasks-owner@example.com',
       password: 'secret123',
     });
-    accessToken = ownerLogin.body.accessToken as string;
+    accessToken = (ownerLogin.body as AuthResponse).accessToken;
 
     await request(server).post('/auth/register').send({
       name: 'Other User',
@@ -49,7 +56,7 @@ describe('Tasks (e2e)', () => {
       email: 'tasks-other@example.com',
       password: 'secret123',
     });
-    otherUserToken = otherLogin.body.accessToken as string;
+    otherUserToken = (otherLogin.body as AuthResponse).accessToken;
   });
 
   afterAll(async () => {
@@ -73,7 +80,7 @@ describe('Tasks (e2e)', () => {
         description: 'Milk and eggs',
         status: 'PENDING',
       });
-      taskId = response.body.id as string;
+      taskId = (response.body as TaskResponse).id;
     });
 
     it('rejects an empty title', () => {
@@ -100,8 +107,9 @@ describe('Tasks (e2e)', () => {
         .set('Authorization', authHeader())
         .expect(200);
 
-      expect(response.body.data).toHaveLength(1);
-      expect(response.body.meta).toMatchObject({
+      const body = response.body as TaskListResponse;
+      expect(body.data).toHaveLength(1);
+      expect(body.meta).toMatchObject({
         total: 1,
         page: 1,
         limit: 10,
@@ -115,7 +123,7 @@ describe('Tasks (e2e)', () => {
         .set('Authorization', authHeader())
         .expect(200);
 
-      expect(response.body.data).toHaveLength(0);
+      expect((response.body as TaskListResponse).data).toHaveLength(0);
     });
 
     it('does not list tasks that belong to another user', async () => {
@@ -124,7 +132,7 @@ describe('Tasks (e2e)', () => {
         .set('Authorization', `Bearer ${otherUserToken}`)
         .expect(200);
 
-      expect(response.body.data).toHaveLength(0);
+      expect((response.body as TaskListResponse).data).toHaveLength(0);
     });
   });
 
@@ -135,7 +143,7 @@ describe('Tasks (e2e)', () => {
         .set('Authorization', authHeader())
         .expect(200);
 
-      expect(response.body.id).toBe(taskId);
+      expect((response.body as TaskResponse).id).toBe(taskId);
     });
 
     it('returns 404 for a task owned by another user', () => {
@@ -154,7 +162,7 @@ describe('Tasks (e2e)', () => {
         .send({ status: 'DONE' })
         .expect(200);
 
-      expect(response.body.status).toBe('DONE');
+      expect((response.body as TaskResponse).status).toBe('DONE');
     });
 
     it('returns 404 when updating a task owned by another user', () => {
