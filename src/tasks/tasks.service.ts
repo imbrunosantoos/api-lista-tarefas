@@ -41,12 +41,13 @@ export class TasksService {
       userId,
       ...(query.status && { status: query.status }),
       ...(query.priority && { priority: query.priority }),
+      ...(query.search && { title: { contains: query.search } }),
     };
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.task.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [query.sortBy ?? 'createdAt']: query.order ?? 'desc' },
         skip: (page - 1) * limit,
         take: limit,
       }),

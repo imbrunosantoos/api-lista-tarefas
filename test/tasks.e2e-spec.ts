@@ -165,6 +165,32 @@ describe('Tasks (e2e)', () => {
       expect((response.body as TaskListResponse).data).toHaveLength(0);
     });
 
+    it('searches tasks by title', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/tasks')
+        .query({ search: 'groceries' })
+        .set('Authorization', authHeader())
+        .expect(200);
+
+      expect((response.body as TaskListResponse).data).toHaveLength(1);
+
+      const empty = await request(app.getHttpServer())
+        .get('/tasks')
+        .query({ search: 'no-such-task' })
+        .set('Authorization', authHeader())
+        .expect(200);
+
+      expect((empty.body as TaskListResponse).data).toHaveLength(0);
+    });
+
+    it('rejects an invalid sort field', () => {
+      return request(app.getHttpServer())
+        .get('/tasks')
+        .query({ sortBy: 'password' })
+        .set('Authorization', authHeader())
+        .expect(400);
+    });
+
     it('does not list tasks that belong to another user', async () => {
       const response = await request(app.getHttpServer())
         .get('/tasks')
