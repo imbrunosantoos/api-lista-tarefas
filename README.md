@@ -4,6 +4,7 @@ A REST API for managing personal to-do lists, built with NestJS, Prisma and SQLi
 
 I built this project to practice what a real backend needs beyond the basic CRUD: authentication, data isolation between users, request validation, automated tests and proper API documentation.
 
+[![CI](https://github.com/imbrunosantoos/api-lista-tarefas/actions/workflows/ci.yml/badge.svg)](https://github.com/imbrunosantoos/api-lista-tarefas/actions/workflows/ci.yml)
 [![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
