@@ -61,28 +61,9 @@ curl -X POST http://localhost:3000/tasks \
 curl http://localhost:3000/tasks -H "Authorization: Bearer $TOKEN"
 ```
 
-## Data model
+## How the data is organized
 
-```mermaid
-erDiagram
-    USER ||--o{ TASK : owns
-    USER {
-        string id PK
-        string name
-        string email UK
-        string password
-        datetime createdAt
-    }
-    TASK {
-        string id PK
-        string title
-        string description
-        string status
-        datetime createdAt
-        datetime updatedAt
-        string userId FK
-    }
-```
+The database has only two tables. A `users` table with name, unique email and the bcrypt-hashed password, and a `tasks` table where each task has a title, an optional description and a status. Every task belongs to a user, and deleting a user removes their tasks along with it. Nothing more than the project actually needs.
 
 ## Running locally
 
