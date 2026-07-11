@@ -131,14 +131,18 @@ npm run test:e2e  # end-to-end tests
 
 ```
 src/
-├── auth/          # register, login, JWT strategy and guard
+├── auth/          # register, login, refresh/logout, JWT strategy and guard
 ├── users/         # user service and profile endpoint
 ├── tasks/         # task CRUD: controller, service, DTOs
 ├── prisma/        # PrismaService + global module
+├── docs/          # custom Swagger UI theme
 ├── app.module.ts
-└── main.ts        # bootstrap, validation pipe, Swagger setup
+└── main.ts        # bootstrap, security, validation pipe, Swagger setup
 prisma/            # schema and migrations
 test/              # e2e suites (auth, users, tasks)
+.github/workflows/ # CI: lint, build, tests and Docker image
+Dockerfile         # multi-stage production build
+docker-compose.yml
 ```
 
 ## License
